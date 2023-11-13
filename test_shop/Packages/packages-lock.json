@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.medvedya.select_implementation_property_drawer": {
+      "version": "https://github.com/medvedya/Select-implementation-property-drawer.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "82e319eb6c15a12a228b722d68213cbe0b00e244"
+    },
     "com.unity.collab-proxy": {
       "version": "2.2.0",
       "depth": 0,
