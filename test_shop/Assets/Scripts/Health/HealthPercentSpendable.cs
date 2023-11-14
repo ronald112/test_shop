@@ -8,7 +8,6 @@ namespace Health
     public class HealthPercentSpendable : ISpendable
     {
         [SerializeField] private float amountToSpendPercent;
-        [SerializeField] private string name;
         private bool isCanSpend;
 
         public bool IsCanSpend()
@@ -25,12 +24,7 @@ namespace Health
             HealthManager.Instance.HealthAmount -= HealthManager.Instance.HealthAmount * amountToSpendPercent;
             return true;
         }
-
-        public string GetName()
-        {
-            return name;
-        }
-
+        
         public void InitAction()
         {
             HealthManager.Instance.onHealthAmountChanged += _ => TryHealthAmountAndInvoke();

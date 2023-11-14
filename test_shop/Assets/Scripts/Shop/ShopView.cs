@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Core;
 using UnityEngine;
 
@@ -11,14 +13,60 @@ namespace Shop
 
         private void Awake()
         {
-            foreach (var spendable in shopSettingsSo.Spendables)
+            foreach (var bundle in shopSettingsSo.Bundles)
             {
-                var element = UnityEngine.Object.Instantiate(shopElementPrefab, panel.transform);
+                if (bundle.Spendables == null || bundle.Rewards == null)
+                {
+                    Debug.LogWarning($"Bundle {bundle.BundleName} set up error");
+                    continue;
+                }
                 
-                spendable.InitAction();
-                element.Setup(spendable.GetName(), () => spendable.TrySpend());
-                spendable.OnCanSpendChanged += value => element.SetButtonEnable(value);
+                var element = UnityEngine.Object.Instantiate(shopElementPrefab, panel.transform);
+
+                InitBundleSpendables(bundle.Spendables, element);
+                element.Setup(bundle.BundleName, () => OnSpendClick(bundle));
             }
+        }
+
+        private void OnSpendClick(ShopBundle bundleSpendables)
+        {
+            foreach (var bundleSpendable in bundleSpendables.Spendables)
+            {
+                if (!bundleSpendable.TrySpend())
+                    return;
+            }
+
+            foreach (var bundleSpendablesReward in bundleSpendables.Rewards)
+            {
+                bundleSpendablesReward.GiveReward();
+            }
+        }
+
+        private void InitBundleSpendables(ISpendable[] bundleSpendables, ShopElement element)
+        {
+            foreach (var spendable in bundleSpendables)
+            {
+                spendable.InitAction();
+                spendable.OnCanSpendChanged += value => OnCanSpendChanged(value, bundleSpendables, element);
+            }
+        }
+
+        private void OnCanSpendChanged(bool value, ISpendable[] bundleSpendable, ShopElement element)
+        {
+            if (value)
+            {
+                foreach (var spendable in bundleSpendable)
+                {
+                    if (!spendable.IsCanSpend())
+                    {
+                        element.SetButtonEnable(false);
+                        return;
+                    }
+                }
+                element.SetButtonEnable(true);
+                return;
+            }
+            element.SetButtonEnable(false);
         }
     }
 }

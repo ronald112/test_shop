@@ -10,10 +10,11 @@ namespace Location
             get => locationManager;
             private set => locationManager = value;
         }
-        public static readonly string DefaultLocationName = "Undefined";
 
-        private event Action<string> innerOnLocationChanged;
-        public event Action<string> onLocationChanged
+        public static readonly LocationType DefaultLocationName = LocationType.Undefined;
+
+        private event Action<LocationType> innerOnLocationChanged;
+        public event Action<LocationType> onLocationChanged
         {
             add
             {
@@ -24,8 +25,8 @@ namespace Location
         }
 
         // todo: init from somewhere
-        private string locationName = DefaultLocationName;
-        public string LocationName
+        private LocationType locationName = DefaultLocationName;
+        public LocationType LocationName
         {
             get => locationName;
             set

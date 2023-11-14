@@ -9,9 +9,17 @@ namespace Health
     public class HealthSpendable : ISpendable
     {
         [SerializeField] private int amountToSpent;
-        [SerializeField] private string bundleName;
         private bool isCanSpend;
-        public event Action<bool> OnCanSpendChanged;
+        private event Action<bool> innerOnCanSpendChanged;
+        public event Action<bool> OnCanSpendChanged
+        {
+            add
+            {
+                innerOnCanSpendChanged += value;
+                value(IsCanSpend());
+            }
+            remove => innerOnCanSpendChanged -= value;
+        }
 
         public bool IsCanSpend()
         {
@@ -23,28 +31,23 @@ namespace Health
 
         public bool TrySpend()
         {
-            if (amountToSpent > HealthManager.Instance.HealthAmount)
+            if (!IsCanSpend())
                 return false;
             HealthManager.Instance.HealthAmount -= amountToSpent;
             return true;
         }
-
-        public string GetName()
-        {
-            return bundleName;
-        }
         
         public void InitAction()
         {
-            HealthManager.Instance.onHealthAmountChanged += _ => TryHealthAmountAndInvoke();
+            HealthManager.Instance.onHealthAmountChanged += _ => InvokeIfSpendChanged();
         }
 
-        private void TryHealthAmountAndInvoke()
+        private void InvokeIfSpendChanged()
         {
             if (IsCanSpend() != isCanSpend)
             {
                 isCanSpend = !isCanSpend;
-                OnCanSpendChanged?.Invoke(isCanSpend);
+                innerOnCanSpendChanged?.Invoke(isCanSpend);
             }
         }
     }

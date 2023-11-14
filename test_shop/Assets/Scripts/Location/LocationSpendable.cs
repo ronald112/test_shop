@@ -1,5 +1,6 @@
 using System;
 using Core;
+using Unity.Plastic.Newtonsoft.Json.Schema;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -8,30 +9,43 @@ namespace Location
     [Serializable]
     public class LocationSpendable : ISpendable
     {
-        [SerializeField] private string locationName;
-        [SerializeField] private string bundleName;
-        public event Action<bool> OnCanSpendChanged;
-
-
+        [SerializeField] private LocationType locationName;
+        private bool isCanSpend;
+        private event Action<bool> innerOnCanSpendChanged;
+        public event Action<bool> OnCanSpendChanged
+        {
+            add
+            {
+                innerOnCanSpendChanged += value;
+                value(IsCanSpend());
+            }
+            remove => innerOnCanSpendChanged -= value;
+        }
+        
+        public bool IsCanSpend()
+        {
+            return (int)LocationManager.Instance.LocationName == (int)locationName;
+        }
+        
         public bool TrySpend()
         {
-            LocationManager.Instance.LocationName = locationName;
+            if (!IsCanSpend())
+                return false;
             return true;
-        }
-
-        public string GetName()
-        {
-            return bundleName;
         }
         
         public void InitAction()
         {
-            LocationManager.Instance.onLocationChanged += _ => TryLocationAmountAndInvoke();
+            LocationManager.Instance.onLocationChanged += _ => InvokeIfSpendChanged();
         }
 
-        private void TryLocationAmountAndInvoke()
+        private void InvokeIfSpendChanged()
         {
-            OnCanSpendChanged?.Invoke(true);
+            if (IsCanSpend() != isCanSpend)
+            {
+                isCanSpend = !isCanSpend;
+                innerOnCanSpendChanged?.Invoke(isCanSpend);
+            }
         }
     }
 }

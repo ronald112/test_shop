@@ -274,7 +274,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Text: {fileID: 2765463477566492778}
-  AddGoldButton: {fileID: 0}
+  AddGoldButton: {fileID: 1194786153293616319}
   addGoldCheatAmount: 100
 --- !u!1 &7748758286621607140
 GameObject:

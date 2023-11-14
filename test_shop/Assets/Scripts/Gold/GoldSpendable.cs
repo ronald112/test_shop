@@ -9,12 +9,20 @@ namespace Gold
     public class GoldSpendable : ISpendable
     {
         [SerializeField] private int amountToSpent;
-        [SerializeField] private string bundleName;
 
         private bool isCanSpend;
-        public event Action<bool> OnCanSpendChanged;
+        private event Action<bool> innerOnCanSpendChanged;
+        public event Action<bool> OnCanSpendChanged
+        {
+            add
+            {
+                innerOnCanSpendChanged += value;
+                value(IsCanSpend());
+            }
+            remove => innerOnCanSpendChanged -= value;
+        }
 
-        private bool IsCanSpend()
+        public bool IsCanSpend()
         {
             if (amountToSpent > GoldManager.Instance.GoldAmount)
                 return false;
@@ -26,27 +34,21 @@ namespace Gold
             if (!IsCanSpend())
                 return false;
             GoldManager.Instance.GoldAmount -= amountToSpent;
-            CheckGoldAmountAndInvoke();
             return true;
         }
 
-        private void CheckGoldAmountAndInvoke()
+        private void InvokeIfSpendChanged()
         {
             if (IsCanSpend() != isCanSpend)
             {
                 isCanSpend = !isCanSpend;
-                OnCanSpendChanged?.Invoke(isCanSpend);
+                innerOnCanSpendChanged?.Invoke(isCanSpend);
             }
         }
-
-        public string GetName()
-        {
-            return bundleName;
-        }
-
+        
         public void InitAction()
         {
-            GoldManager.Instance.onGoldAmountChanged += _ => CheckGoldAmountAndInvoke();
+            GoldManager.Instance.onGoldAmountChanged += _ => InvokeIfSpendChanged();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Location
 
         private void Awake()
         {
-            LocationManager.Instance.onLocationChanged += SetHealth;
+            LocationManager.Instance.onLocationChanged += SetLocation;
             DefaultLocationButton.onClick.AddListener(OnAddGoldCheat);
         }
 
@@ -20,9 +20,9 @@ namespace Location
             LocationManager.Instance.LocationName = LocationManager.DefaultLocationName;
         }
 
-        private void SetHealth(string value)
+        private void SetLocation(LocationType value)
         {
-            Text.text = value;
+            Text.text = value.ToString();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Core
     {
         public event Action<bool> OnCanSpendChanged;
         public bool TrySpend();
-        public string GetName();
         public void InitAction();
+        public bool IsCanSpend();
     }
 }

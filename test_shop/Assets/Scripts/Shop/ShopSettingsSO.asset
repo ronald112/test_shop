@@ -12,14 +12,89 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 175d2372e25c4c2e8da2095b6aec7d8d, type: 3}
   m_Name: ShopSettingsSO
   m_EditorClassIdentifier: 
-  Spendables:
-  - rid: 8534413980766568448
-  Rewards: []
+  Bundles:
+  - BundleName: NewPlayerStartBundle
+    Spendables:
+    - rid: 8534413987660955653
+    - rid: 8534413987660955667
+    Rewards:
+    - rid: 8534413987660955655
+    - rid: 8534413987660955656
+    - rid: 8534413987660955657
+  - BundleName: GoToDungeon
+    Spendables:
+    - rid: 8534413987660955658
+    - rid: 8534413987660955659
+    - rid: 8534413987660955660
+    Rewards:
+    - rid: 8534413987660955661
+    - rid: 8534413987660955662
+  - BundleName: BackFromDungeon
+    Spendables:
+    - rid: 8534413987660955663
+    Rewards:
+    - rid: 8534413987660955664
+  - BundleName: GoToShop
+    Spendables:
+    - rid: 8534413987660955665
+    Rewards:
+    - rid: 8534413987660955666
   references:
     version: 2
     RefIds:
-    - rid: 8534413980766568448
+    - rid: 8534413987660955653
       type: {class: GoldSpendable, ns: Gold, asm: Gold}
       data:
         amountToSpent: 100
-        name: keks
+    - rid: 8534413987660955655
+      type: {class: GoldReward, ns: Gold, asm: Gold}
+      data:
+        goldAmount: 1000
+    - rid: 8534413987660955656
+      type: {class: HealthReward, ns: Health, asm: Health}
+      data:
+        healthAmount: 1000
+    - rid: 8534413987660955657
+      type: {class: LocationReward, ns: Location, asm: Location}
+      data:
+        newLocation: 1
+    - rid: 8534413987660955658
+      type: {class: LocationSpendable, ns: Location, asm: Location}
+      data:
+        locationName: 1
+    - rid: 8534413987660955659
+      type: {class: HealthPercentSpendable, ns: Health, asm: Health}
+      data:
+        amountToSpendPercent: 50
+    - rid: 8534413987660955660
+      type: {class: GoldSpendable, ns: Gold, asm: Gold}
+      data:
+        amountToSpent: 500
+    - rid: 8534413987660955661
+      type: {class: GoldReward, ns: Gold, asm: Gold}
+      data:
+        goldAmount: 700
+    - rid: 8534413987660955662
+      type: {class: LocationReward, ns: Location, asm: Location}
+      data:
+        newLocation: 2
+    - rid: 8534413987660955663
+      type: {class: LocationSpendable, ns: Location, asm: Location}
+      data:
+        locationName: 2
+    - rid: 8534413987660955664
+      type: {class: LocationReward, ns: Location, asm: Location}
+      data:
+        newLocation: 1
+    - rid: 8534413987660955665
+      type: {class: GoldSpendable, ns: Gold, asm: Gold}
+      data:
+        amountToSpent: 100
+    - rid: 8534413987660955666
+      type: {class: HealthReward, ns: Health, asm: Health}
+      data:
+        healthAmount: 100
+    - rid: 8534413987660955667
+      type: {class: LocationSpendable, ns: Location, asm: Location}
+      data:
+        locationName: 0
