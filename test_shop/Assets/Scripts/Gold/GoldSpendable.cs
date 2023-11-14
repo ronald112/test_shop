@@ -1,6 +1,7 @@
 using System;
 using Core;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Gold
 {
@@ -8,7 +9,7 @@ namespace Gold
     public class GoldSpendable : ISpendable
     {
         [SerializeField] private int amountToSpent;
-        [SerializeField] private string name;
+        [SerializeField] private string bundleName;
 
         private bool isCanSpend;
         public event Action<bool> OnCanSpendChanged;
@@ -40,7 +41,7 @@ namespace Gold
 
         public string GetName()
         {
-            return name;
+            return bundleName;
         }
 
         public void InitAction()

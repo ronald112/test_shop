@@ -1,6 +1,7 @@
 using System;
 using Core;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Health
 {
@@ -8,7 +9,7 @@ namespace Health
     public class HealthSpendable : ISpendable
     {
         [SerializeField] private int amountToSpent;
-        [SerializeField] private string name;
+        [SerializeField] private string bundleName;
         private bool isCanSpend;
         public event Action<bool> OnCanSpendChanged;
 
@@ -30,7 +31,7 @@ namespace Health
 
         public string GetName()
         {
-            return name;
+            return bundleName;
         }
         
         public void InitAction()

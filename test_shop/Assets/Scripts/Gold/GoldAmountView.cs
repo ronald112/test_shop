@@ -6,13 +6,13 @@ namespace Gold
     public class GoldAmountView : MonoBehaviour
     {
         [SerializeField] private Text Text;
-        [SerializeField] private Button AddGold;
+        [SerializeField] private Button AddGoldButton;
         [SerializeField] private int addGoldCheatAmount = 100;
 
         private void Awake()
         {
             GoldManager.Instance.onGoldAmountChanged += SetGoldAmount;
-            AddGold.onClick.AddListener(OnAddGoldCheat);
+            AddGoldButton.onClick.AddListener(OnAddGoldCheat);
         }
 
         private void OnAddGoldCheat()
