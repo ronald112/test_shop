@@ -1,7 +1,4 @@
 using System;
-using Unity.VisualScripting.YamlDotNet.Serialization;
-using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Gold
 {
@@ -25,7 +22,7 @@ namespace Gold
             remove => innerOnGoldAmountChanged -= value;
         }
 
-        public int? GoldAmountTemp { get; set; } = null;
+        public int? GoldAmountBuffer { get; set; } = null;
 
         // todo: init from somewhere
         private int goldAmount = 100;

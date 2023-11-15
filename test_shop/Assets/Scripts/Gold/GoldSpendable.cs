@@ -16,53 +16,51 @@ namespace Gold
             remove => innerOnCanSpendChanged -= value;
         }
 
+        public ISpendable Head { get; set; }
+
         public ISpendable Next { get; set; }
         
         public void InitAction()
         {
-            GoldManager.Instance.onGoldAmountChanged += _ => innerOnCanSpendChanged?.Invoke(IsCanSpendPipeline());
+            GoldManager.Instance.onGoldAmountChanged += _ => 
+            {
+                Head.ClearBufferPipeline();
+                innerOnCanSpendChanged?.Invoke(Head.CalculatedBufferPipeline());
+            };
         }
         
-        public bool IsCanSpendPipeline()
+        public bool CalculatedBufferPipeline()
         {
-            if (GoldManager.Instance.GoldAmountTemp == null)
-                GoldManager.Instance.GoldAmountTemp = GoldManager.Instance.GoldAmount;
+            if (GoldManager.Instance.GoldAmountBuffer == null)
+                GoldManager.Instance.GoldAmountBuffer = GoldManager.Instance.GoldAmount;
                 
-            if (GoldManager.Instance.GoldAmountTemp >= amountToSpent)
+            if (GoldManager.Instance.GoldAmountBuffer >= amountToSpent)
             {
-                GoldManager.Instance.GoldAmountTemp -= amountToSpent;
-                Next?.IsCanSpendPipeline();
-                GoldManager.Instance.GoldAmountTemp = null;
+                GoldManager.Instance.GoldAmountBuffer -= amountToSpent;
+                if (Next == null)
+                    return true;
+                return Next.CalculatedBufferPipeline();
             }
-            else
-            {
-                GoldManager.Instance.GoldAmountTemp = null;
-                return false;
-            }
-            return true;
+            return false;
         }
 
-        public bool SpendPipeline()
+        public bool ApplyBufferPipeline()
         {
-            if (GoldManager.Instance.GoldAmountTemp == null)
-                GoldManager.Instance.GoldAmountTemp = GoldManager.Instance.GoldAmount;
-                
-            if (GoldManager.Instance.GoldAmountTemp >= amountToSpent)
+            if (GoldManager.Instance.GoldAmountBuffer != null)
             {
-                GoldManager.Instance.GoldAmountTemp -= amountToSpent;
-                Next?.SpendPipeline();
-                if (GoldManager.Instance.GoldAmountTemp != null)
-                {
-                    GoldManager.Instance.GoldAmount = GoldManager.Instance.GoldAmountTemp.Value;
-                    GoldManager.Instance.GoldAmountTemp = null;
-                }
+                GoldManager.Instance.GoldAmount = GoldManager.Instance.GoldAmountBuffer.Value;
+                GoldManager.Instance.GoldAmountBuffer = null;
             }
-            else
-            {
-                GoldManager.Instance.GoldAmountTemp = null;
-                return false;
-            }
-            return true;
+
+            Next?.ApplyBufferPipeline();
+            return false;
+        }
+
+        public void ClearBufferPipeline()
+        {
+            if (GoldManager.Instance.GoldAmountBuffer != null)
+                GoldManager.Instance.GoldAmountBuffer = null;
+            Next?.ClearBufferPipeline();
         }
     }
 }

@@ -30,8 +30,10 @@ namespace Shop
         {
             if (bundleSpendables.Spendables.Length <= 0)
                 return;
-            if (bundleSpendables.Spendables[0].SpendPipeline())
+            bundleSpendables.Spendables[0].ClearBufferPipeline();
+            if (bundleSpendables.Spendables[0].CalculatedBufferPipeline())
             {
+                bundleSpendables.Spendables[0].ApplyBufferPipeline();
                 foreach (var bundleSpendablesReward in bundleSpendables.Rewards)
                 {
                     bundleSpendablesReward.GiveReward();
@@ -41,24 +43,25 @@ namespace Shop
 
         private void InitBundleSpendables(ISpendable[] bundleSpendables, ShopElement element)
         {
-            ISpendable spendableFirst = null;
-            ISpendable spendableNode = null;
+            ISpendable spendableHead = null;
+            ISpendable spendableNext = null;
             foreach (var spendable in bundleSpendables)
             {
-                if (spendableNode == null)
+                spendable.InitAction();
+                spendable.OnCanSpendChanged += element.SetButtonEnable;
+                if (spendableNext == null)
                 {
-                    spendable.InitAction();
-                    spendableFirst = spendableNode = spendable;
-                    spendable.OnCanSpendChanged += element.SetButtonEnable;
+                    spendable.Head = spendableHead = spendableNext = spendable;
                     continue;
                 }
 
-                spendableNode.Next = spendable;
-                spendableNode = spendable;
+                spendableNext.Next = spendable;
+                spendableNext = spendable;
+                spendable.Head = spendableHead;
             }
 
-            if (spendableFirst != null)
-                element.SetButtonEnable(spendableFirst.IsCanSpendPipeline());
+            if (spendableHead != null)
+                element.SetButtonEnable(spendableHead.CalculatedBufferPipeline());
         }
     }
 }

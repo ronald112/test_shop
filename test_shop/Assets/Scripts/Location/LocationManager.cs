@@ -32,6 +32,6 @@ namespace Location
             } 
         }
 
-        public LocationType? LocationNameTemp { get; set; } = null;
+        public LocationType? LocationNameBuffer { get; set; } = null;
     }
 }

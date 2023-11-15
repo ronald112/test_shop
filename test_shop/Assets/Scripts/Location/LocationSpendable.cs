@@ -16,35 +16,52 @@ namespace Location
             remove => innerOnCanSpendChanged -= value;
         }
 
+        public ISpendable Head { get; set; }
+
         public ISpendable Next { get; set; }
         
         public void InitAction()
         {
-            LocationManager.Instance.onLocationChanged += _ => innerOnCanSpendChanged?.Invoke(IsCanSpendPipeline());
+            LocationManager.Instance.onLocationChanged += _ => 
+            {
+                Head.ClearBufferPipeline();
+                innerOnCanSpendChanged?.Invoke(Head.CalculatedBufferPipeline());
+            };
         }
 
-        public bool IsCanSpendPipeline()
+        public bool CalculatedBufferPipeline()
         {
-            if (LocationManager.Instance.LocationNameTemp == null)
-                LocationManager.Instance.LocationNameTemp = LocationManager.Instance.LocationName;
+            if (LocationManager.Instance.LocationNameBuffer == null)
+                LocationManager.Instance.LocationNameBuffer = LocationManager.Instance.LocationName;
                 
-            if (LocationManager.Instance.LocationNameTemp == locationName)
+            if (LocationManager.Instance.LocationNameBuffer == locationName)
             {
-                LocationManager.Instance.LocationNameTemp = locationName;
-                Next?.IsCanSpendPipeline();
-                LocationManager.Instance.LocationNameTemp = null;
+                LocationManager.Instance.LocationNameBuffer = locationName;
+                if (Next == null)
+                    return true;
+                return Next.CalculatedBufferPipeline();
             }
-            else
-            {
-                LocationManager.Instance.LocationNameTemp = null;
-                return false;
-            }
-            return true;
+            return false;
         }
 
-        public bool SpendPipeline()
+        public bool ApplyBufferPipeline()
         {
-            return IsCanSpendPipeline();
+            if (LocationManager.Instance.LocationNameBuffer != null)
+            {
+                LocationManager.Instance.LocationName = LocationManager.Instance.LocationNameBuffer.Value;
+                LocationManager.Instance.LocationNameBuffer = null;
+            }
+
+            Next?.ApplyBufferPipeline();
+                
+            return false;
+        }
+
+        public void ClearBufferPipeline()
+        {
+            if (LocationManager.Instance.LocationNameBuffer != null)
+                LocationManager.Instance.LocationNameBuffer = null;
+            Next?.ClearBufferPipeline();
         }
     }
 }

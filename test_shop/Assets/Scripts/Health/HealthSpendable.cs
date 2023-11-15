@@ -1,7 +1,6 @@
 using System;
 using Core;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Health
 {
@@ -12,60 +11,55 @@ namespace Health
         private event Action<bool> innerOnCanSpendChanged;
         public event Action<bool> OnCanSpendChanged
         {
-            add
-            {
-                innerOnCanSpendChanged += value;
-            }
+            add => innerOnCanSpendChanged += value;
             remove => innerOnCanSpendChanged -= value;
         }
+
+        public ISpendable Head { get; set; }
 
         public ISpendable Next { get; set; }
         
         public void InitAction()
         {
-            HealthManager.Instance.onHealthAmountChanged += _ => innerOnCanSpendChanged?.Invoke(IsCanSpendPipeline());
-        }
-        
-        public bool IsCanSpendPipeline()
-        {
-            if (HealthManager.Instance.HealthAmountTemp == null)
-                HealthManager.Instance.HealthAmountTemp = HealthManager.Instance.HealthAmount;
-                
-            if (HealthManager.Instance.HealthAmountTemp >= amountToSpent)
+            HealthManager.Instance.onHealthAmountChanged += _ =>
             {
-                HealthManager.Instance.HealthAmountTemp -= amountToSpent;
-                Next?.IsCanSpendPipeline();
-                HealthManager.Instance.HealthAmountTemp = null;
-            }
-            else
-            {
-                HealthManager.Instance.HealthAmountTemp = null;
-                return false;
-            }
-            return true;
+                Head.ClearBufferPipeline();
+                innerOnCanSpendChanged?.Invoke(Head.CalculatedBufferPipeline());
+            };
         }
 
-        public bool SpendPipeline()
+        public bool CalculatedBufferPipeline()
         {
-            if (HealthManager.Instance.HealthAmountTemp == null)
-                HealthManager.Instance.HealthAmountTemp = HealthManager.Instance.HealthAmount;
+            if (HealthManager.Instance.HealthAmountBuffer == null)
+                HealthManager.Instance.HealthAmountBuffer = HealthManager.Instance.HealthAmount;
                 
-            if (HealthManager.Instance.HealthAmountTemp >= amountToSpent)
+            if (HealthManager.Instance.HealthAmountBuffer >= amountToSpent)
             {
-                HealthManager.Instance.HealthAmountTemp -= amountToSpent;
-                Next?.SpendPipeline();
-                if (HealthManager.Instance.HealthAmountTemp != null)
-                {
-                    HealthManager.Instance.HealthAmount = HealthManager.Instance.HealthAmountTemp.Value;
-                    HealthManager.Instance.HealthAmountTemp = null;
-                }
+                HealthManager.Instance.HealthAmountBuffer -= amountToSpent;
+                if (Next == null)
+                    return true;
+                return Next.CalculatedBufferPipeline();
             }
-            else
+            return false;
+        }
+        
+        public bool ApplyBufferPipeline()
+        {
+            if (HealthManager.Instance.HealthAmountBuffer != null)
             {
-                HealthManager.Instance.HealthAmountTemp = null;
-                return false;
+                HealthManager.Instance.HealthAmount = HealthManager.Instance.HealthAmountBuffer.Value;
+                HealthManager.Instance.HealthAmountBuffer = null;
             }
-            return true;
+
+            Next?.ApplyBufferPipeline();
+            return false;
+        }
+
+        public void ClearBufferPipeline()
+        {
+            if (HealthManager.Instance.HealthAmountBuffer != null)
+                HealthManager.Instance.HealthAmountBuffer = null;
+            Next?.ClearBufferPipeline();
         }
     }
 }

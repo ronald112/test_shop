@@ -30,6 +30,6 @@ namespace Health
             } 
         }
 
-        public float? HealthAmountTemp { get; set; } = null;
+        public float? HealthAmountBuffer { get; set; } = null;
     }
 }

@@ -26,6 +26,7 @@ MonoBehaviour:
     - rid: 8534413987660955658
     - rid: 8534413987660955659
     - rid: 8534413987660955660
+    - rid: 8534413987660955668
     Rewards:
     - rid: 8534413987660955661
     - rid: 8534413987660955662
@@ -65,7 +66,7 @@ MonoBehaviour:
     - rid: 8534413987660955659
       type: {class: HealthPercentSpendable, ns: Health, asm: Health}
       data:
-        amountToSpendPercent: 50
+        amountToSpendPercent: 0.5
     - rid: 8534413987660955660
       type: {class: GoldSpendable, ns: Gold, asm: Gold}
       data:
@@ -98,3 +99,7 @@ MonoBehaviour:
       type: {class: LocationSpendable, ns: Location, asm: Location}
       data:
         locationName: 0
+    - rid: 8534413987660955668
+      type: {class: HealthSpendable, ns: Health, asm: Health}
+      data:
+        amountToSpent: 10
