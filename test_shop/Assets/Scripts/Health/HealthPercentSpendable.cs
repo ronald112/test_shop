@@ -9,12 +9,7 @@ namespace Health
     {
         [SerializeField] private float amountToSpendPercent;
         
-        private event Action<bool> innerOnCanSpendChanged;
-        public event Action<bool> OnCanSpendChanged
-        {
-            add => innerOnCanSpendChanged += value;
-            remove => innerOnCanSpendChanged -= value;
-        }
+        public event Action<bool> OnCanSpendChanged;
 
         public ISpendable Head { get; set; }
 
@@ -25,7 +20,7 @@ namespace Health
             HealthManager.Instance.onHealthAmountChanged += _ => 
             {
                 Head.ClearBufferPipeline();
-                innerOnCanSpendChanged?.Invoke(Head.CalculatedBufferPipeline());
+                OnCanSpendChanged?.Invoke(Head.CalculatedBufferPipeline());
             };
         }
         

@@ -15,12 +15,7 @@ namespace Gold
             private set => goldManager = value;
         }
 
-        private event Action<int> innerOnGoldAmountChanged;
-        public event Action<int> onGoldAmountChanged
-        {
-            add => innerOnGoldAmountChanged += value;
-            remove => innerOnGoldAmountChanged -= value;
-        }
+        public event Action<int> onGoldAmountChanged;
 
         public int? GoldAmountBuffer { get; set; } = null;
 
@@ -32,7 +27,7 @@ namespace Gold
             set
             {
                 goldAmount = value;
-                innerOnGoldAmountChanged?.Invoke(goldAmount);
+                onGoldAmountChanged?.Invoke(goldAmount);
             } 
         }
     }

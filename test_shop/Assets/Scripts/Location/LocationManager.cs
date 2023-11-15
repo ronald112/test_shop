@@ -13,12 +13,7 @@ namespace Location
 
         public static readonly LocationType DefaultLocationName = LocationType.Undefined;
 
-        private event Action<LocationType> innerOnLocationChanged;
-        public event Action<LocationType> onLocationChanged
-        {
-            add => innerOnLocationChanged += value;
-            remove => innerOnLocationChanged -= value;
-        }
+        public event Action<LocationType> onLocationChanged;
 
         // todo: init from somewhere
         private LocationType locationName = DefaultLocationName;
@@ -28,7 +23,7 @@ namespace Location
             set
             {
                 locationName = value;
-                innerOnLocationChanged?.Invoke(locationName);
+                onLocationChanged?.Invoke(locationName);
             } 
         }
 

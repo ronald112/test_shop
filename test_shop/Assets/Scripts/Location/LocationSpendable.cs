@@ -8,13 +8,7 @@ namespace Location
     public class LocationSpendable : ISpendable
     {
         [SerializeField] private LocationType locationName;
-        private event Action<bool> innerOnCanSpendChanged;
-
-        public event Action<bool> OnCanSpendChanged
-        {
-            add => innerOnCanSpendChanged += value;
-            remove => innerOnCanSpendChanged -= value;
-        }
+        public event Action<bool> OnCanSpendChanged;
 
         public ISpendable Head { get; set; }
 
@@ -25,7 +19,7 @@ namespace Location
             LocationManager.Instance.onLocationChanged += _ => 
             {
                 Head.ClearBufferPipeline();
-                innerOnCanSpendChanged?.Invoke(Head.CalculatedBufferPipeline());
+                OnCanSpendChanged?.Invoke(Head.CalculatedBufferPipeline());
             };
         }
 

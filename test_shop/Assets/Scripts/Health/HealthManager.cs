@@ -11,12 +11,7 @@ namespace Health
             private set => healthManager = value;
         }
 
-        private event Action<float> innerOnHealthAmountChanged;
-        public event Action<float> onHealthAmountChanged
-        {
-            add => innerOnHealthAmountChanged += value;
-            remove => innerOnHealthAmountChanged -= value;
-        }
+        public event Action<float> onHealthAmountChanged;
         
         // todo: init from somewhere
         private float healthAmount = 100;
@@ -26,7 +21,7 @@ namespace Health
             set
             {
                 healthAmount = value;
-                innerOnHealthAmountChanged?.Invoke(healthAmount);
+                onHealthAmountChanged?.Invoke(healthAmount);
             } 
         }
 
