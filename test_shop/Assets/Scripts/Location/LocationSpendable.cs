@@ -1,8 +1,6 @@
 using System;
 using Core;
-using Unity.Plastic.Newtonsoft.Json.Schema;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Location
 {
@@ -10,42 +8,43 @@ namespace Location
     public class LocationSpendable : ISpendable
     {
         [SerializeField] private LocationType locationName;
-        private bool isCanSpend;
         private event Action<bool> innerOnCanSpendChanged;
+
         public event Action<bool> OnCanSpendChanged
         {
-            add
-            {
-                innerOnCanSpendChanged += value;
-                value(IsCanSpend());
-            }
+            add => innerOnCanSpendChanged += value;
             remove => innerOnCanSpendChanged -= value;
         }
-        
-        public bool IsCanSpend()
-        {
-            return (int)LocationManager.Instance.LocationName == (int)locationName;
-        }
-        
-        public bool TrySpend()
-        {
-            if (!IsCanSpend())
-                return false;
-            return true;
-        }
+
+        public ISpendable Next { get; set; }
         
         public void InitAction()
         {
-            LocationManager.Instance.onLocationChanged += _ => InvokeIfSpendChanged();
+            LocationManager.Instance.onLocationChanged += _ => innerOnCanSpendChanged?.Invoke(IsCanSpendPipeline());
         }
 
-        private void InvokeIfSpendChanged()
+        public bool IsCanSpendPipeline()
         {
-            if (IsCanSpend() != isCanSpend)
+            if (LocationManager.Instance.LocationNameTemp == null)
+                LocationManager.Instance.LocationNameTemp = LocationManager.Instance.LocationName;
+                
+            if (LocationManager.Instance.LocationNameTemp == locationName)
             {
-                isCanSpend = !isCanSpend;
-                innerOnCanSpendChanged?.Invoke(isCanSpend);
+                LocationManager.Instance.LocationNameTemp = locationName;
+                Next?.IsCanSpendPipeline();
+                LocationManager.Instance.LocationNameTemp = null;
             }
+            else
+            {
+                LocationManager.Instance.LocationNameTemp = null;
+                return false;
+            }
+            return true;
+        }
+
+        public bool SpendPipeline()
+        {
+            return IsCanSpendPipeline();
         }
     }
 }

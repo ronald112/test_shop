@@ -5,8 +5,10 @@ namespace Core
     public interface ISpendable
     {
         public event Action<bool> OnCanSpendChanged;
-        public bool TrySpend();
+        public ISpendable Next { get; set; }
+
         public void InitAction();
-        public bool IsCanSpend();
+        public bool SpendPipeline();
+        public bool IsCanSpendPipeline();
     }
 }

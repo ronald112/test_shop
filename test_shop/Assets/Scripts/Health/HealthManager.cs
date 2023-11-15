@@ -14,11 +14,7 @@ namespace Health
         private event Action<float> innerOnHealthAmountChanged;
         public event Action<float> onHealthAmountChanged
         {
-            add
-            {
-                innerOnHealthAmountChanged += value;
-                value(healthAmount);
-            }
+            add => innerOnHealthAmountChanged += value;
             remove => innerOnHealthAmountChanged -= value;
         }
         
@@ -33,5 +29,7 @@ namespace Health
                 innerOnHealthAmountChanged?.Invoke(healthAmount);
             } 
         }
+
+        public float? HealthAmountTemp { get; set; } = null;
     }
 }

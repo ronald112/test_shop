@@ -13,6 +13,7 @@ namespace Gold
         {
             GoldManager.Instance.onGoldAmountChanged += SetGoldAmount;
             AddGoldButton.onClick.AddListener(OnAddGoldCheat);
+            SetGoldAmount(GoldManager.Instance.GoldAmount);
         }
 
         private void OnAddGoldCheat()

@@ -1,7 +1,6 @@
 using System;
 using Core;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Gold
 {
@@ -10,45 +9,60 @@ namespace Gold
     {
         [SerializeField] private int amountToSpent;
 
-        private bool isCanSpend;
         private event Action<bool> innerOnCanSpendChanged;
         public event Action<bool> OnCanSpendChanged
         {
-            add
-            {
-                innerOnCanSpendChanged += value;
-                value(IsCanSpend());
-            }
+            add => innerOnCanSpendChanged += value;
             remove => innerOnCanSpendChanged -= value;
         }
 
-        public bool IsCanSpend()
-        {
-            if (amountToSpent > GoldManager.Instance.GoldAmount)
-                return false;
-            return true;
-        }
-
-        public bool TrySpend()
-        {
-            if (!IsCanSpend())
-                return false;
-            GoldManager.Instance.GoldAmount -= amountToSpent;
-            return true;
-        }
-
-        private void InvokeIfSpendChanged()
-        {
-            if (IsCanSpend() != isCanSpend)
-            {
-                isCanSpend = !isCanSpend;
-                innerOnCanSpendChanged?.Invoke(isCanSpend);
-            }
-        }
+        public ISpendable Next { get; set; }
         
         public void InitAction()
         {
-            GoldManager.Instance.onGoldAmountChanged += _ => InvokeIfSpendChanged();
+            GoldManager.Instance.onGoldAmountChanged += _ => innerOnCanSpendChanged?.Invoke(IsCanSpendPipeline());
+        }
+        
+        public bool IsCanSpendPipeline()
+        {
+            if (GoldManager.Instance.GoldAmountTemp == null)
+                GoldManager.Instance.GoldAmountTemp = GoldManager.Instance.GoldAmount;
+                
+            if (GoldManager.Instance.GoldAmountTemp >= amountToSpent)
+            {
+                GoldManager.Instance.GoldAmountTemp -= amountToSpent;
+                Next?.IsCanSpendPipeline();
+                GoldManager.Instance.GoldAmountTemp = null;
+            }
+            else
+            {
+                GoldManager.Instance.GoldAmountTemp = null;
+                return false;
+            }
+            return true;
+        }
+
+        public bool SpendPipeline()
+        {
+            if (GoldManager.Instance.GoldAmountTemp == null)
+                GoldManager.Instance.GoldAmountTemp = GoldManager.Instance.GoldAmount;
+                
+            if (GoldManager.Instance.GoldAmountTemp >= amountToSpent)
+            {
+                GoldManager.Instance.GoldAmountTemp -= amountToSpent;
+                Next?.SpendPipeline();
+                if (GoldManager.Instance.GoldAmountTemp != null)
+                {
+                    GoldManager.Instance.GoldAmount = GoldManager.Instance.GoldAmountTemp.Value;
+                    GoldManager.Instance.GoldAmountTemp = null;
+                }
+            }
+            else
+            {
+                GoldManager.Instance.GoldAmountTemp = null;
+                return false;
+            }
+            return true;
         }
     }
 }

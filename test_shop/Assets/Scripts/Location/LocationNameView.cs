@@ -13,6 +13,7 @@ namespace Location
         {
             LocationManager.Instance.onLocationChanged += SetLocation;
             DefaultLocationButton.onClick.AddListener(OnAddGoldCheat);
+            SetLocation(LocationManager.Instance.LocationName);
         }
 
         private void OnAddGoldCheat()

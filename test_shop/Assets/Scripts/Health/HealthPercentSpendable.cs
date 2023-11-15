@@ -8,35 +8,61 @@ namespace Health
     public class HealthPercentSpendable : ISpendable
     {
         [SerializeField] private float amountToSpendPercent;
-        private bool isCanSpend;
-
-        public bool IsCanSpend()
+        
+        private event Action<bool> innerOnCanSpendChanged;
+        public event Action<bool> OnCanSpendChanged
         {
-            if (HealthManager.Instance.HealthAmount > 0)
-                return true;
-            return false;
+            add => innerOnCanSpendChanged += value;
+            remove => innerOnCanSpendChanged -= value;
         }
 
-        public event Action<bool> OnCanSpendChanged;
-
-        public bool TrySpend()
-        {
-            HealthManager.Instance.HealthAmount -= HealthManager.Instance.HealthAmount * amountToSpendPercent;
-            return true;
-        }
+        public ISpendable Next { get; set; }
         
         public void InitAction()
         {
-            HealthManager.Instance.onHealthAmountChanged += _ => TryHealthAmountAndInvoke();
+            HealthManager.Instance.onHealthAmountChanged += _ => innerOnCanSpendChanged?.Invoke(IsCanSpendPipeline());
+        }
+        
+        public bool IsCanSpendPipeline()
+        {
+            if (HealthManager.Instance.HealthAmountTemp == null)
+                HealthManager.Instance.HealthAmountTemp = HealthManager.Instance.HealthAmount;
+                
+            if (HealthManager.Instance.HealthAmountTemp > 0)
+            {
+                HealthManager.Instance.HealthAmountTemp -= HealthManager.Instance.HealthAmountTemp * amountToSpendPercent;
+                Next?.IsCanSpendPipeline();
+                HealthManager.Instance.HealthAmountTemp = null;
+            }
+            else
+            {
+                HealthManager.Instance.HealthAmountTemp = null;
+                return false;
+            }
+            return true;
         }
 
-        private void TryHealthAmountAndInvoke()
+        public bool SpendPipeline()
         {
-            if (IsCanSpend() != isCanSpend)
+            if (HealthManager.Instance.HealthAmountTemp == null)
+                HealthManager.Instance.HealthAmountTemp = HealthManager.Instance.HealthAmount;
+                
+            if (HealthManager.Instance.HealthAmountTemp > 0)
             {
-                isCanSpend = !isCanSpend;
-                OnCanSpendChanged?.Invoke(isCanSpend);
+                HealthManager.Instance.HealthAmountTemp -= HealthManager.Instance.HealthAmountTemp * amountToSpendPercent;
+                Next?.SpendPipeline();
+                if (HealthManager.Instance.HealthAmountTemp != null)
+                {
+                    HealthManager.Instance.HealthAmount = HealthManager.Instance.HealthAmountTemp.Value;
+                    HealthManager.Instance.HealthAmountTemp = null;
+                }
             }
+            else
+            {
+                HealthManager.Instance.HealthAmountTemp = null;
+                return false;
+            }
+            return true;
         }
     }
 }

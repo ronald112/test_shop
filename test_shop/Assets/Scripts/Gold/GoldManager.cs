@@ -21,14 +21,12 @@ namespace Gold
         private event Action<int> innerOnGoldAmountChanged;
         public event Action<int> onGoldAmountChanged
         {
-            add
-            {
-                innerOnGoldAmountChanged += value;
-                value(goldAmount);
-            }
+            add => innerOnGoldAmountChanged += value;
             remove => innerOnGoldAmountChanged -= value;
         }
-        
+
+        public int? GoldAmountTemp { get; set; } = null;
+
         // todo: init from somewhere
         private int goldAmount = 100;
         public int GoldAmount

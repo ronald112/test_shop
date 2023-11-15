@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Core;
 using UnityEngine;
 
@@ -30,43 +28,37 @@ namespace Shop
 
         private void OnSpendClick(ShopBundle bundleSpendables)
         {
-            foreach (var bundleSpendable in bundleSpendables.Spendables)
+            if (bundleSpendables.Spendables.Length <= 0)
+                return;
+            if (bundleSpendables.Spendables[0].SpendPipeline())
             {
-                if (!bundleSpendable.TrySpend())
-                    return;
-            }
-
-            foreach (var bundleSpendablesReward in bundleSpendables.Rewards)
-            {
-                bundleSpendablesReward.GiveReward();
+                foreach (var bundleSpendablesReward in bundleSpendables.Rewards)
+                {
+                    bundleSpendablesReward.GiveReward();
+                }
             }
         }
 
         private void InitBundleSpendables(ISpendable[] bundleSpendables, ShopElement element)
         {
+            ISpendable spendableFirst = null;
+            ISpendable spendableNode = null;
             foreach (var spendable in bundleSpendables)
             {
-                spendable.InitAction();
-                spendable.OnCanSpendChanged += value => OnCanSpendChanged(value, bundleSpendables, element);
-            }
-        }
-
-        private void OnCanSpendChanged(bool value, ISpendable[] bundleSpendable, ShopElement element)
-        {
-            if (value)
-            {
-                foreach (var spendable in bundleSpendable)
+                if (spendableNode == null)
                 {
-                    if (!spendable.IsCanSpend())
-                    {
-                        element.SetButtonEnable(false);
-                        return;
-                    }
+                    spendable.InitAction();
+                    spendableFirst = spendableNode = spendable;
+                    spendable.OnCanSpendChanged += element.SetButtonEnable;
+                    continue;
                 }
-                element.SetButtonEnable(true);
-                return;
+
+                spendableNode.Next = spendable;
+                spendableNode = spendable;
             }
-            element.SetButtonEnable(false);
+
+            if (spendableFirst != null)
+                element.SetButtonEnable(spendableFirst.IsCanSpendPipeline());
         }
     }
 }

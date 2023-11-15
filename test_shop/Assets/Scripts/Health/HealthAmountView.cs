@@ -16,6 +16,7 @@ namespace Health
         {
             HealthManager.Instance.onHealthAmountChanged += SetHealthAmount;
             addGoldButton.onClick.AddListener(OnAddGoldCheat);
+            SetHealthAmount(HealthManager.Instance.HealthAmount);
         }
 
         private void OnAddGoldCheat()

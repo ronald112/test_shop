@@ -16,11 +16,7 @@ namespace Location
         private event Action<LocationType> innerOnLocationChanged;
         public event Action<LocationType> onLocationChanged
         {
-            add
-            {
-                innerOnLocationChanged += value;
-                value(locationName);
-            }
+            add => innerOnLocationChanged += value;
             remove => innerOnLocationChanged -= value;
         }
 
@@ -35,5 +31,7 @@ namespace Location
                 innerOnLocationChanged?.Invoke(locationName);
             } 
         }
+
+        public LocationType? LocationNameTemp { get; set; } = null;
     }
 }
